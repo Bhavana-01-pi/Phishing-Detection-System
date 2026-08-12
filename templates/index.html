@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>PhishDetector | AI Security</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    /* --- GLOBAL CYBER THEME --- */
+    :root {
+        --bg-color: #0f172a;       /* Deep Midnight Blue */
+        --card-bg: #1e293b;        /* Lighter Blue-Grey */
+        --accent: #06b6d4;         /* Neon Cyan */
+        --accent-hover: #0891b2;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --danger: #ef4444;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        font-family: 'Poppins', sans-serif;
+        color: var(--text-main);
+        overflow-x: hidden;
+        background-image: radial-gradient(#1e293b 1px, transparent 1px);
+        background-size: 30px 30px;
+    }
+
+    /* --- NAVBAR --- */
+    .navbar {
+        background: rgba(15, 23, 42, 0.95); 
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: 15px 0;
+    }
+    .navbar-brand {
+        font-weight: 700;
+        font-size: 24px;
+        color: white !important;
+        letter-spacing: 1px;
+    }
+    .navbar-brand span { color: var(--accent); }
+    
+    .nav-link {
+        color: var(--text-muted) !important;
+        font-weight: 500;
+        margin-left: 20px;
+        transition: 0.3s;
+    }
+    .nav-link:hover, .nav-link.active, .nav-link:focus {
+        color: var(--accent) !important;
+    }
+
+    /* Dropdown Styles */
+    .dropdown-menu-dark {
+        background-color: var(--card-bg);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .dropdown-item { color: var(--text-muted); }
+    .dropdown-item:hover {
+        background-color: rgba(6, 182, 212, 0.1);
+        color: var(--accent);
+    }
+    .dropdown-header { color: var(--accent); font-weight: 600; }
+
+    /* --- HERO SECTION --- */
+    .hero-section {
+        padding: 100px 0 60px;
+        text-align: center;
+        position: relative;
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        background: -webkit-linear-gradient(#fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .hero-subtitle {
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto 40px;
+    }
+
+    /* --- SEARCH BAR --- */
+    .search-container {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 10px;
+        border-radius: 50px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        max-width: 700px;
+        margin: 0 auto;
+        transition: 0.3s;
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+    }
+    
+    .search-container:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
+    }
+
+    .url-input {
+        background: transparent;
+        border: none;
+        color: white;
+        flex-grow: 1;
+        padding: 15px 25px;
+        font-size: 16px;
+        outline: none;
+    }
+    .url-input::placeholder { color: #64748b; }
+
+    .scan-btn {
+        background: var(--accent);
+        color: #0f172a;
+        border: none;
+        padding: 12px 35px;
+        border-radius: 40px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: 0.3s;
+    }
+    .scan-btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(6, 182, 212, 0.4);
+    }
+
+    /* --- HISTORY PANEL --- */
+    .history-wrapper {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .manage-link {
+        color: var(--text-muted);
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        transition: 0.3s;
+        border: 1px solid transparent;
+    }
+    .manage-link:hover {
+        color: var(--accent);
+        background: rgba(6, 182, 212, 0.1);
+        border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    .history-box {
+        display: none;
+        width: 100%;
+        max-width: 700px;
+        background: var(--card-bg);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+
+    .history-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        transition: 0.2s;
+    }
+    .history-item:hover { background: rgba(255,255,255,0.05); }
+    
+    .history-url {
+        cursor: pointer;
+        color: var(--text-main);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 80%;
+    }
+    .history-url:hover { color: var(--accent); }
+
+    .delete-btn {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+        border: none;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+    .delete-btn:hover { background: var(--danger); color: white; }
+
+    .clear-all {
+        color: var(--text-muted);
+        font-size: 12px;
+        cursor: pointer;
+        text-decoration: underline;
+        background: none;
+        border: none;
+    }
+    .clear-all:hover { color: var(--danger); }
+
+    /* --- INFO CARDS --- */
+    .info-section { padding: 60px 0; }
+    .info-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        height: 100%;
+        transition: 0.3s;
+    }
+    .info-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent);
+    }
+    .info-icon {
+        font-size: 30px;
+        color: var(--accent);
+        margin-bottom: 20px;
+    }
+    .info-card h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 15px; }
+    .info-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* --- FOOTER --- */
+    footer {
+        text-align: center;
+        padding: 40px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('home') }}">
+        <i class="fas fa-shield-alt"></i> Phish<span>Detector</span>
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="fa fa-bars" style="color: white;"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link active" href="{{ url_for('home') }}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('usecases') }}">Usecases</a></li>
+          
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Help
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+              <li><h6 class="dropdown-header">Report Phishing</h6></li>
+              <li><a class="dropdown-item" href="https://safebrowsing.google.com/safebrowsing/report_phish/?hl=en" target="_blank">Google Safe Browsing</a></li>
+              <li><a class="dropdown-item" href="https://support.google.com/websearch/answer/106318" target="_blank">Google Support</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Take Phishing Quiz</h6></li>
+              <li><a class="dropdown-item" href="https://www.phishingbox.com/phishing-iq-test" target="_blank">Phishingbox</a></li>
+              <li><a class="dropdown-item" href="https://www.intradyn.com/phishing-quiz/" target="_blank">Intradyn</a></li>
+            </ul>
+          </li>
+
+        </ul>
+        <a href="static/assets/Phishing Website Identification.pdf" class="btn btn-outline-light ms-3 btn-sm" download>
+            <i class="fas fa-download"></i> Guide
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero-section">
+    <div class="container">
+      <h1 class="hero-title">Is that link safe?</h1>
+      <p class="hero-subtitle">
+        Analyze suspicious URLs in real-time using AI, Computer Vision, and advanced threat intelligence.
+      </p>
+
+      <form action="/predict" method="POST" id="scan-form">
+        <div class="search-container">
+            <i class="fas fa-link ms-3" style="color: var(--text-muted);"></i>
+            <input type="url" name="url" class="url-input" id="url-input" 
+                   placeholder="Paste a URL (e.g., https://example.com)" required autocomplete="off">
+            <button type="submit" class="scan-btn">
+                Scan Now
+            </button>
+        </div>
+      </form>
+
+      <div class="history-wrapper">
+        <div class="manage-link" onclick="toggleHistoryUI()">
+            <i class="fas fa-history"></i> Manage Scan History
+        </div>
+
+        <div id="history-ui" class="history-box">
+            <div class="history-header">
+                <strong>Recent Scans</strong>
+                <button class="clear-all" onclick="clearAllHistory()">Clear All</button>
+            </div>
+            <ul id="history-list-ul" class="history-list">
+                </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="info-section container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="info-card">
+                <div class="info-icon"><i class="fas fa-brain"></i></div>
+                <h3>AI-Powered Detection</h3>
+                <p>Our machine learning model analyzes URL structure and domain patterns to detect zero-day phishing attacks that traditional filters miss.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card">
+                <div class="info-icon"><i class="fas fa-eye"></i></div>
+                <h3>Visual Analysis</h3>
+                <p>We use computer vision to "see" the website. If a site looks like Netflix or PayPal but isn't hosted on their domain, we flag it immediately.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card">
+                <div class="info-icon"><i class="fas fa-lock"></i></div>
+                <h3>Heuristic Checks</h3>
+                <p>Advanced checks for IP-based URLs, Typosquatting (e.g., 'paypa1.com'), and insecure HTTP connections ensure robust protection.</p>
+            </div>
+        </div>
+    </div>
+  </section>
+
+  <section id="about" class="info-section container" style="padding-top: 0;">
+    <div class="info-card" style="border-left: 4px solid var(--accent);">
+        <h3>About PhishDetector</h3>
+        <p>
+            Phishing is an internet scam in which an attacker sends out fake messages that look to come from a trusted source.
+            PhishDetector is a final-year project designed to help internet users authenticate URL links. 
+            The system combines Machine Learning, Heuristic Rules, and Visual Analysis to provide a comprehensive Risk Score.
+        </p>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 PhishDetector Project. Created by Final Year CS Students.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    const STORAGE_KEY = 'phishingScanHistory';
+    const scanForm = document.getElementById('scan-form');
+    const urlInput = document.getElementById('url-input');
+    const historyUI = document.getElementById('history-ui');
+    const historyListUl = document.getElementById('history-list-ul');
+
+    function getHistory() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    }
+
+    function renderManageList() {
+        const history = getHistory();
+        historyListUl.innerHTML = '';
+        
+        if (history.length === 0) {
+            historyListUl.innerHTML = '<li style="text-align:center; color:#666; padding:10px;">No recent history.</li>';
+            return;
+        }
+
+        history.forEach((url) => {
+            let li = document.createElement('li');
+            li.className = 'history-item';
+            li.innerHTML = `
+                <span class="history-url" onclick="fillInput('${url}')" title="Re-scan this URL">${url}</span>
+                <button class="delete-btn" onclick="deleteOne('${url}')"><i class="fas fa-trash-alt"></i></button>
+            `;
+            historyListUl.appendChild(li);
+        });
+    }
+
+    function toggleHistoryUI() {
+        if (historyUI.style.display === 'block') {
+            historyUI.style.display = 'none';
+        } else {
+            renderManageList();
+            historyUI.style.display = 'block';
+        }
+    }
+
+    function fillInput(url) {
+        urlInput.value = url;
+        urlInput.focus();
+    }
+
+    function deleteOne(urlToDelete) {
+        let history = getHistory();
+        history = history.filter(url => url !== urlToDelete);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        renderManageList();
+    }
+
+    function clearAllHistory() {
+        if(confirm('Clear entire history?')) {
+            localStorage.removeItem(STORAGE_KEY);
+            renderManageList();
+        }
+    }
+
+    scanForm.addEventListener('submit', function() {
+        const url = urlInput.value.trim();
+        if (url) {
+            let history = getHistory();
+            history = history.filter(item => item !== url);
+            history.unshift(url);
+            if (history.length > 15) history.pop();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        }
+    });
+  </script>
+
+</body>
+</html>
