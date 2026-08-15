@@ -5,15 +5,30 @@
 
 ![image1](https://github.com/asrith-reddy/Phishing-detector/assets/76733972/fe706a06-84fe-493f-abb8-34d3fbc594b5)
 -->
+<img width="1337" height="638" alt="Screenshot1" src="https://github.com/user-attachments/assets/94750580-bbc4-453e-9718-8679b8abeec0" />
+
 
 ## Objective
 
-A phishing website is a common social engineering method that mimics trustful uniform resource locators (URLs) and webpages. The objective of this project is to train machine learning models and deep neural nets on the dataset created to predict phishing websites. Both phishing and benign URLs of websites are gathered to form a dataset and from them required URL and website content-based features are extracted. The performance level of each model is measures and compared.
+A phishing website is a common social engineering method that mimics trustful uniform resource locators (URLs) and webpages to deceive users into disclosing sensitive personal, financial, or authentication data. The objective of this project is to build an end-to-end phishing detection and forensic analysis system that combines Supervised Machine Learning with Computer Vision (Visual Similarity) and Heuristic Rules.
+
+Both phishing and benign URLs are gathered to form a structured dataset, and essential address-bar, domain, and content-based features are extracted. Nine machine learning models are evaluated and compared. To overcome the limitations of URL-only classification against novel, zero-day phishing attacks, the system integrates real-time headless browser automation to capture live screenshots, perceptual hashing (pHash) to detect visual clones of targeted brands, and Levenshtein distance algorithms to catch typosquatting attempts.
 
 ## Installation
-To install the required packages and libraries, run this command in the project directory after Forking and cloning this repository:
+1. To install the required packages and libraries, run this command in the project directory after Forking and cloning this repository:
 ```bash
 pip install -r requirements.txt
+```
+2. Setup Reference Database
+To enable visual clone detection against target brands:
+Ensure the reference_images/ directory contains baseline screenshots of protected brands (e.g., google.png, netflix.png, paypal.png).
+Run the automated capture script to generate or update reference images:
+```bash
+python capture_references.py
+```
+3. Run the Web Application
+```bash
+python app.py
 ```
 
 ## Technologies Used
@@ -26,7 +41,33 @@ pip install -r requirements.txt
 [<img target="_blank" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScq-xocLctL07Jy0tpR_p9w0Q42_rK1aAkNfW6sm3ucjFKWML39aaJPgdhadyCnEiK7vw&usqp=CAU" width=200>](https://flask.palletsprojects.com/en/2.0.x/) 
 
 ## Feature Extraction
-The system starts by retrieving URLs to be checked for phishing. These URLs can be collected from user input in the webpage created. Once the URLs are obtained, the system extracts relevant features from the web pages. These features are essential for training and evaluating the machine learning models. Various features were extracted from the URL database based on Domain, HTML and Address bar of the URLs. 
+The system starts by retrieving URLs to be analyzed from the user input through the interactive web interface. Once the URL is received, the system extracts critical structural and domain characteristics to evaluate risk:
+
+#### 1.Address Bar & Structural Features:
+
+IP Address in URL: Checks if the domain is represented as a raw IP (e.g., [http://192.168.1.1](http://192.168.1.1)).
+
+URL Length: Flags abnormally long URLs designed to obscure the domain path.
+
+Shortening Services: Identifies redirection techniques through services like bit.ly or tinyurl.
+
+@ Symbol Usage: Detects browser redirection instructions where everything preceding @ is ignored.
+
+Prefix/Suffix Separation: Analyzes hyphens (-) used in domain names to impersonate brands.
+
+Subdomains & Multi-Level Domains: Measures domain depth and nesting levels.
+
+#### 2.Domain & Network Features:
+
+HTTPS / SSL Certificate Status: Verifies whether the site uses valid, trusted encryption protocols.
+
+Domain Registration Length: Evaluates domain longevity; phishing domains are typically registered for minimal durations (1 year).
+
+#### 3.Heuristic & Impersonation Features:
+
+Typosquatting Detection: Uses the Levenshtein Distance algorithm to calculate character edit distances against known legitimate brands (e.g., detecting paypa1.com instead of paypal.com).
+
+Keyword Impersonation: Scans subdomains and paths for unauthorized brand names (e.g., netflix-support.com).
 
 ## Machine Learning Models
 
@@ -52,8 +93,17 @@ Accuracy of various model used for URL detection
 7|	Logistic Regression|        	0.934|	0.941|	0.943|	0.927|
 8|	Naive Bayes Classifier|     	0.605|	0.454|	0.292|	0.997|
 
+## Visual Similarity Analysis
+
+Visual Similarity Analysis (Computer Vision Layer)URL-based classifiers can be bypassed by zero-day phishing sites hosted on reputable cloud domains or completely new domain names. To counter this, our system incorporates a real-time Visual Analysis pipeline:Headless Browser Capture: Selenium launches a headless Chrome instance with an eager page load strategy to safely visit the URL and take a full-resolution viewport screenshot.Blank Page & Error Filtering: An image variance check (ImageStat.stddev) examines the screenshot. If the site is unreachable, broken, or a blank white screen, visual comparison is skipped to avoid false alarms.Perceptual Hashing (pHash): Unlike cryptographic hashes, pHash generates a 64-bit structural fingerprint based on Discrete Cosine Transforms (DCT) of visual layouts.Hamming Distance Comparison: The generated hash is compared with reference hashes of official brand login portals. If the Hamming difference is below the similarity threshold ($< 12$) while the domain does not match the authentic domain, the page is flagged as a Critical Visual Clone.
+
 ## Conclusion
-1. The final take away form this project is to explore various machine learning models, perform Exploratory Data Analysis on phishing dataset and understanding their features. 
-2. Creating this notebook helped me to learn a lot about the features affecting the models to detect whether URL is safe or not, also I came to know how to tuned model and how they affect the model performance.
-3. The final conclusion on the Phishing dataset is that the some feature like "HTTTPS", "AnchorURL", "WebsiteTraffic" have more importance to classify URL is phishing URL or not.
-4. Gradient Boosting Classifier currectly classify URL upto 97.4% respective classes and hence reduces the chance of malicious attachments.
+This project demonstrates the complete lifecycle of developing a robust phishing detection system, from Exploratory Data Analysis (EDA) on raw URL datasets to deploying a multi-layered hybrid application.
+
+### Key insights from the project include:
+
+Key Predictive Features: Structural features such as HTTPS availability, Anchor URL distribution, URL length, and registration duration have the strongest influence on machine learning classifiers.
+
+Model Selection: The Gradient Boosting Classifier achieved the highest overall performance with an accuracy of 97.4%, a recall of 0.994, and an F1-score of 0.977, significantly reducing false negatives.
+
+Hybrid Defense: Relying strictly on machine learning can leave gaps when dealing with newly registered, visually deceptive domains. Combining the Gradient Boosting model with Perceptual Hashing (Visual Analysis) and Levenshtein Typosquatting heuristics provides comprehensive, real-time protection against both structured attacks and zero-day visual clones.
